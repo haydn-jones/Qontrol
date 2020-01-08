@@ -45,29 +45,28 @@ class CartPoleQontrol():
         epsilon = self.get_episilon()
         learning_rate = self.get_learning_rate()
 
-        env = gym.make("CartPole-v1")
-        observation = env.reset()
+        observation = self.env.reset()
         done = False
         while not done:
             if visualize:
-                env.render()
+                self.env.render()
 
-            action = self.get_action(env, observation, epsilon)
+            action = self.get_action(observation, epsilon)
 
-            next_observation, reward, done, _ = env.step(action)
+            next_observation, reward, done, _ = self.env.step(action)
 
             self.update_bellman(observation, action, reward, next_observation, learning_rate)
 
             observation = next_observation
             total_reward += 1
 
-        env.close()
+        self.env.close()
 
         return total_reward
 
-    def get_action(self, env, state, epsilon):
+    def get_action(self, state, epsilon):
         if random() < epsilon:
-            return env.action_space.sample()
+            return self.env.action_space.sample()
 
         return np.argmax(self.Q[state])
 
