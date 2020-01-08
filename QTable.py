@@ -3,6 +3,9 @@ import numpy as np
 
 class DiscretizeQTable():
     """Q Table that takes a continuous domain and discretizes it by means of bucketing (histogram)
+
+       Has `__getitem__` and `__setitem__` functions that *discretize the state*, so the Q table can
+       be accessed directly with the *raw* state
     """
     def __init__(self, n_actions, lows, highs, bin_counts):
         """
@@ -18,18 +21,15 @@ class DiscretizeQTable():
             Number of bins used for each index. 1 bin means the element will not be used as it
             will always be mapped to bin 0
         """
-        self.q_table = {}
-
         self.n_actions = n_actions
-        
+
         self.lows = np.array(lows)
         self.highs = np.array(highs)
         self.bin_counts = np.array(bin_counts, dtype=int)
-        
+
         self.bin_widths = (self.highs - self.lows) / self.bin_counts
 
         self.Q = np.zeros(tuple(self.bin_counts) + (self.n_actions, ), dtype=np.float32)
-
 
     def discretize_state(self, state):
         state = np.clip(state, self.lows, self.highs) # clip observation to [low, high]

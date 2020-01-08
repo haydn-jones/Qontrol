@@ -16,12 +16,12 @@ def find_observed_observation_bounds(env, episodes=1_000_000):
             action = env.action_space.sample()
             observation, _, done, _ = env.step(action)
 
-            min_ = np.minimum(observation, min_)
-            max_ = np.maximum(observation, max_)
+            min_ = np.minimum(observation, min_) # Element-wise
+            max_ = np.maximum(observation, max_) # Element-wise
 
             if done:
                 break
-    
+
     env.close()
 
     return min_, max_
