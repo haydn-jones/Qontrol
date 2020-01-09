@@ -33,8 +33,8 @@ class DiscretizeQTable():
 
     def discretize_state(self, state):
         state = np.clip(state, self.lows, self.highs) # clip observation to [low, high]
-        hist = np.floor((state - self.lows) / self.bin_widths) # calcualte which bin each component falls into
-        hist = np.clip(hist, 0, self.bin_counts - 1).astype(int) # Observations at boundaries will be placed in bin outside range
+        hist = ((state - self.lows) / self.bin_widths).astype(int) # calcualte which bin each component falls into, astype(int) floors
+        hist = np.minimum(hist, self.bin_counts - 1) # elements sometimes get pushed into a bin that doesnt exist
 
         return hist
 
