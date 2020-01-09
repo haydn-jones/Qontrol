@@ -6,7 +6,7 @@ from random import random
 class CartPoleQontrol():
     """Class that trains a Q-Learning agent to play CartPole
     """
-    def __init__(self, lows=[-2.5, -4.5, -0.28, -4.0], highs=[2.5, 4.5, 0.28, 4.0], bin_counts=[1, 1, 6, 12], discount_factor=0.999):
+    def __init__(self, lows=[-2.5, -4.5, -0.28, -4.0], highs=[2.5, 4.5, 0.28, 4.0], bin_counts=[3, 3, 4, 8], discount_factor=0.999):
         """
         Notes
         -----
@@ -30,18 +30,16 @@ class CartPoleQontrol():
 
         self.env = gym.make("CartPole-v1")
 
-        self.solved_avg = 195     # Solved when average performance is 195
-        self.solved_period = 100  # over 100 episodes
-        self.cur_avg = 0          # keeps track of the rolling average
+        self.solved_avg    = 195                          # Solved when average performance is 195
+        self.solved_period = 100                          # over 100 episodes
+        self.last_rewards  = np.zeros(self.solved_period) # keeps track of the las 100 total rewards
+        self.solved = False
 
         self.episodes = 0         # How many training episodes have been run
 
         self.Q = DiscretizeQTable(2, lows, highs, bin_counts)
 
-
     def train_episode(self, visualize=False):
-        self.episodes += 1
-
         epsilon = self.get_epsilon()
         learning_rate = self.get_learning_rate()
 
@@ -61,6 +59,13 @@ class CartPoleQontrol():
 
             if done:
                 break
+        
+        # Check whether or not we solved cartpole at this episode
+        self.last_rewards[self.episodes % self.solved_period] = step + 1
+        if np.average(self.last_rewards) >= self.solved_avg:
+            self.solved = True
+
+        self.episodes += 1
 
         return step + 1
 
@@ -71,7 +76,7 @@ class CartPoleQontrol():
         return np.argmax(self.Q[state])
 
     def get_epsilon(self):
-        return max(0.1, np.power(np.e, -1 * self.episodes / 100))
+        return np.power(np.e, -1 * self.episodes / 100) # Allow epsilon to fully decay to 0
 
     def get_learning_rate(self):
         return max(0.1, np.power(np.e, -1 * self.episodes / 100))
