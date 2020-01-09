@@ -2,18 +2,19 @@ import numpy as np
 import gym
 from QTable import DiscretizeQTable
 from random import random
-import math
 
 class CartPoleQontrol():
     """Class that trains a Q-Learning agent to play CartPole
     """
-    def __init__(self, lows=[-2.5, -4.5, -0.28, -4.0], highs=[2.5, 4.5, 0.28, 4.0], bin_counts=[2, 3, 3, 6], discount_factor=0.999):
+    def __init__(self, lows=[-2.5, -4.5, -0.28, -4.0], highs=[2.5, 4.5, 0.28, 4.0], bin_counts=[1, 1, 6, 12], discount_factor=0.999):
         """
         Notes
         -----
         The default lows and highs were found by running `find_observed_observation_bounds` in
         utils.py for 1,000,000 episodes (or by looking at the cartpole source code). The bin
         counts were found by a gridsearch (not yet, but they will ;) ).
+
+        Episode is considered terminated after 200 steps, but that isn't enforeced so we do it in the loop
 
         Parameters
         ----------
@@ -40,14 +41,13 @@ class CartPoleQontrol():
 
     def train_episode(self, visualize=False):
         self.episodes += 1
-        total_reward = 0
 
-        epsilon = self.get_episilon()
+        epsilon = self.get_epsilon()
         learning_rate = self.get_learning_rate()
 
         observation = self.env.reset()
-        done = False
-        while not done:
+
+        for step in range(200): # Episode considered done after 200 steps
             if visualize:
                 self.env.render()
 
@@ -58,11 +58,11 @@ class CartPoleQontrol():
             self.update_bellman(observation, action, reward, next_observation, learning_rate)
 
             observation = next_observation
-            total_reward += 1
 
-        self.env.close()
+            if done:
+                break
 
-        return total_reward
+        return step + 1
 
     def get_action(self, state, epsilon):
         if random() < epsilon:
@@ -70,13 +70,11 @@ class CartPoleQontrol():
 
         return np.argmax(self.Q[state])
 
-    def get_episilon(self):
-        return math.pow(math.e, -1 * self.episodes / 100)
+    def get_epsilon(self):
+        return max(0.1, np.power(np.e, -1 * self.episodes / 100))
 
     def get_learning_rate(self):
-        return 0.1
+        return max(0.1, np.power(np.e, -1 * self.episodes / 100))
 
     def update_bellman(self, state, action, reward, next_state, learning_rate):
-        new_q = (1 - learning_rate) * self.Q[state, action] + learning_rate * (reward + self.discount_factor * np.max(self.Q[next_state]))
-
-        self.Q[state, action] = new_q
+        self.Q[state, action] += learning_rate * (reward + self.discount_factor * np.max(self.Q[next_state]) - self.Q[state, action])

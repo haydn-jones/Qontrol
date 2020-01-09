@@ -1,19 +1,14 @@
-import gym
-import math
-import matplotlib.pyplot as plt
-import numpy as np
 from Agents import CartPoleQontrol
+from utils import TrainPlotter
+from tqdm import trange
 
 def main():
 	agent = CartPoleQontrol()
+	plotter = TrainPlotter()
 
-	rewards = []
-	for _ in range(10_000):
+	for _ in trange(1_000):
 		reward = agent.train_episode(visualize=True)
-		rewards.append(reward)
-
-		print(reward)
-
+		plotter.update(agent, reward)
 
 if __name__ == "__main__":
 	main()
