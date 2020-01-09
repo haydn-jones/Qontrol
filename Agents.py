@@ -3,7 +3,76 @@ import gym
 from QTable import DiscretizeQTable
 from random import random
 
-class CartPoleQontrol():
+class QontrolAgent():
+    """ Base Qontrol agent class
+    """ 
+    def __init__(self, env, lows, highs, bin_counts, actions, discount_factor):
+        """
+        Parameters
+        ----------
+        lows : :obj:`list` of :obj:`float`
+            Lower bounds of each element in the observation (elements will be clipped to this)
+        highs : :obj:`list` of :obj:`float`
+            Upper bounds of each element in the observation (elements will be clipped to this)
+        bin_counts : :obj:`list` of :obj:`int`
+            Number of bins used for each index. 1 bin means the element will not be used as it
+            will always be mapped to bin 0
+        actions : :obj: `int`
+            Number of actions you can take in the environment
+        discount_factor : :obj: 'float'
+            Value to discount future reward by
+        """
+
+        self.Q = DiscretizeQTable(actions, lows, highs, bin_counts)
+        
+        self.discount_factor = discount_factor
+        self.episodes = 0 # How many training episodes have been run
+        
+        self.epsilon_time_constant = 100
+        self.lr_time_constant = 100
+
+        self.env = gym.make(env)
+
+    def train_episode(self, visualize=False):
+        epsilon = self.get_epsilon()
+        learning_rate = self.get_learning_rate()
+
+        total_reward = 0
+        done = False
+        observation = self.env.reset()
+        while not done:
+            if visualize:
+                self.env.render()
+
+            action = self.get_action(observation, epsilon)
+            next_observation, reward, done, _ = self.env.step(action)
+
+            self.update_bellman(observation, action, reward, next_observation, learning_rate)
+
+            observation = next_observation
+
+            total_reward += reward
+
+        self.episodes += 1
+
+        return total_reward
+
+    def get_action(self, state, epsilon):
+        if random() < epsilon:
+            return self.env.action_space.sample()
+
+        return np.argmax(self.Q[state])
+
+    def update_bellman(self, state, action, reward, next_state, learning_rate):
+        self.Q[state, action] += learning_rate * (reward + self.discount_factor * np.max(self.Q[next_state]) - self.Q[state, action])
+    
+    def get_epsilon(self):
+        return np.power(np.e, -1 * self.episodes / self.epsilon_time_constant) # Allow epsilon to fully decay to 0
+
+    def get_learning_rate(self):
+        return max(0.1, np.power(np.e, -1 * self.episodes / self.lr_time_constant))
+
+class CartPoleQontrol(QontrolAgent):
     """Class that trains a Q-Learning agent to play CartPole
     """
     def __init__(self, lows=[-2.5, -4.5, -0.28, -4.0], highs=[2.5, 4.5, 0.28, 4.0], bin_counts=[3, 3, 4, 8], discount_factor=0.999):
@@ -14,8 +83,6 @@ class CartPoleQontrol():
         utils.py for 1,000,000 episodes (or by looking at the cartpole source code). The bin
         counts were found by a gridsearch (not yet, but they will ;) ).
 
-        Episode is considered terminated after 200 steps, but that isn't enforeced so we do it in the loop
-
         Parameters
         ----------
         lows : :obj:`list` of :obj:`float`
@@ -25,61 +92,12 @@ class CartPoleQontrol():
         bin_counts : :obj:`list` of :obj:`int`
             Number of bins used for each index. 1 bin means the element will not be used as it
             will always be mapped to bin 0
+        discount_factor : :obj: 'float'
+            Value to discount future reward by
         """
-        self.discount_factor = discount_factor
-
-        self.env = gym.make("CartPole-v1")
-
-        self.solved_avg    = 195                          # Solved when average performance is 195
-        self.solved_period = 100                          # over 100 episodes
-        self.last_rewards  = np.zeros(self.solved_period) # keeps track of the las 100 total rewards
-        self.solved = False
-
-        self.episodes = 0         # How many training episodes have been run
-
-        self.Q = DiscretizeQTable(2, lows, highs, bin_counts)
+        super().__init__("CartPole-v1", lows, highs, bin_counts, 2, discount_factor)
 
     def train_episode(self, visualize=False):
-        epsilon = self.get_epsilon()
-        learning_rate = self.get_learning_rate()
-
-        observation = self.env.reset()
-
-        for step in range(200): # Episode considered done after 200 steps
-            if visualize:
-                self.env.render()
-
-            action = self.get_action(observation, epsilon)
-
-            next_observation, reward, done, _ = self.env.step(action)
-
-            self.update_bellman(observation, action, reward, next_observation, learning_rate)
-
-            observation = next_observation
-
-            if done:
-                break
+        total_reward = super().train_episode(visualize=visualize)
         
-        # Check whether or not we solved cartpole at this episode
-        self.last_rewards[self.episodes % self.solved_period] = step + 1
-        if np.average(self.last_rewards) >= self.solved_avg:
-            self.solved = True
-
-        self.episodes += 1
-
-        return step + 1
-
-    def get_action(self, state, epsilon):
-        if random() < epsilon:
-            return self.env.action_space.sample()
-
-        return np.argmax(self.Q[state])
-
-    def get_epsilon(self):
-        return np.power(np.e, -1 * self.episodes / 100) # Allow epsilon to fully decay to 0
-
-    def get_learning_rate(self):
-        return max(0.1, np.power(np.e, -1 * self.episodes / 100))
-
-    def update_bellman(self, state, action, reward, next_state, learning_rate):
-        self.Q[state, action] += learning_rate * (reward + self.discount_factor * np.max(self.Q[next_state]) - self.Q[state, action])
+        return total_reward

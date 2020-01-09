@@ -10,9 +10,5 @@ def main():
 		reward = agent.train_episode(visualize=False)
 		plotter.update(agent, reward)
 
-		if agent.solved == True:
-			print("Solved!")
-			break
-
 if __name__ == "__main__":
 	main()
