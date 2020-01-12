@@ -34,6 +34,7 @@ class QontrolAgent():
 
 		self.env = gym.make(env)
 
+	@profile
 	def train_episode(self, visualize=False, max_steps=np.inf):
 		""" Runs an episode and updates at each step with the Bellman equation. Returns cumulative reward """\
 
@@ -42,19 +43,19 @@ class QontrolAgent():
 
 		total_reward = 0
 		observation = self.env.reset()
+		observation = self.Q.discretize_state(observation)
 		for i in itertools.count(start=1): # Infinite for, keeps track of iterations
 			if visualize:
 				self.env.render()
 
 			action = self.get_action(observation, epsilon)
 			next_observation, reward, done, _ = self.env.step(action)
+			next_observation = self.Q.discretize_state(next_observation)
 
 			self.update_bellman(observation, action, reward, next_observation, learning_rate)
 
 			observation = next_observation
-
 			total_reward += reward
-
 			if done or i >= max_steps:
 				break
 
@@ -73,7 +74,7 @@ class QontrolAgent():
 	def update_bellman(self, state, action, reward, next_state, learning_rate):
 		""" Updates Q table accorind to the bellman equation """
 
-		self.Q[state, action] += learning_rate * (reward + self.discount_factor * np.max(self.Q[next_state]) - self.Q[state, action])
+		self.Q[state, action] = (1 - learning_rate) * self.Q[state, action] + learning_rate * (reward + self.discount_factor * np.max(self.Q[next_state]))
 
 	def get_epsilon(self):
 		""" Returns epsilon to be used at episode self.episodes """

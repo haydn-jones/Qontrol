@@ -3,9 +3,6 @@ import numpy as np
 
 class DiscretizeQTable():
 	"""Q Table that takes a continuous domain and discretizes it by means of bucketing (histogram)
-
-	   Has `__getitem__` and `__setitem__` functions that *discretize the state*, so the Q table can
-	   be accessed directly with the *raw* state
 	"""
 	def __init__(self, n_actions, lows, highs, bin_counts):
 		"""
@@ -43,15 +40,11 @@ class DiscretizeQTable():
 		if isinstance(state, tuple):
 			state, action = state
 
-		state = self.discretize_state(state)
-
 		return self.Q[tuple(state)][action]
 
 	def __setitem__(self, state, value):
 		action = slice(None, None, None) # if action is not provided this slices the whole row at state
 		if isinstance(state, tuple):
 			state, action = state
-
-		state = self.discretize_state(state)
 
 		self.Q[tuple(state)][action] = value
