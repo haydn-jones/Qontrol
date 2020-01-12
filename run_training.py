@@ -1,4 +1,4 @@
-from Agents import CartPoleQontrol
+from agents import CartPoleQontrol
 from utils import TrainPlotter
 from tqdm import trange
 
