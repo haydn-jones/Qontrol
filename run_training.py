@@ -7,7 +7,7 @@ def main():
 	plotter = TrainPlotter()
 
 	for _ in trange(1_000):
-		reward = agent.train_episode(visualize=False)
+		reward = agent.train_episode(visualize=False, max_steps=200)
 		plotter.update(agent, reward)
 
 if __name__ == "__main__":

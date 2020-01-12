@@ -2,11 +2,12 @@ import numpy as np
 import gym
 from QTable import DiscretizeQTable
 from random import random
+import itertools
 
 class QontrolAgent():
     """ Base Qontrol agent class
     """ 
-    def __init__(self, env, lows, highs, bin_counts, actions, discount_factor):
+    def __init__(self, env, lows, highs, bin_counts, actions, discount_factor, epsilon_time_constant, lr_time_constant):
         """
         Parameters
         ----------
@@ -28,19 +29,18 @@ class QontrolAgent():
         self.discount_factor = discount_factor
         self.episodes = 0 # How many training episodes have been run
         
-        self.epsilon_time_constant = 100
-        self.lr_time_constant = 100
+        self.epsilon_time_constant = epsilon_time_constant
+        self.lr_time_constant = lr_time_constant
 
         self.env = gym.make(env)
 
-    def train_episode(self, visualize=False):
+    def train_episode(self, visualize=False, max_steps=np.inf):
         epsilon = self.get_epsilon()
         learning_rate = self.get_learning_rate()
 
         total_reward = 0
-        done = False
         observation = self.env.reset()
-        while not done:
+        for i in itertools.count(start=1): # Infinite for, keeps track of iterations
             if visualize:
                 self.env.render()
 
@@ -52,6 +52,9 @@ class QontrolAgent():
             observation = next_observation
 
             total_reward += reward
+
+            if done or i >= max_steps:
+                break
 
         self.episodes += 1
 
@@ -75,13 +78,20 @@ class QontrolAgent():
 class CartPoleQontrol(QontrolAgent):
     """Class that trains a Q-Learning agent to play CartPole
     """
-    def __init__(self, lows=[-2.5, -4.5, -0.28, -4.0], highs=[2.5, 4.5, 0.28, 4.0], bin_counts=[3, 3, 4, 8], discount_factor=0.999):
+    def __init__(self,
+                lows=[-2.5, -4.5, -0.28, -4.0], 
+                highs=[2.5, 4.5, 0.28, 4.0], 
+                bin_counts=[3, 3, 4, 8], 
+                discount_factor=0.999,
+                epsilon_time_constant = 100,
+                lr_time_constant = 100,
+    ):
         """
         Notes
         -----
         The default lows and highs were found by running `find_observed_observation_bounds` in
         utils.py for 1,000,000 episodes (or by looking at the cartpole source code). The bin
-        counts were found by a gridsearch (not yet, but they will ;) ).
+        counts and time constants were found by a gridsearch (not yet, but they will ;) ).
 
         Parameters
         ----------
@@ -95,9 +105,9 @@ class CartPoleQontrol(QontrolAgent):
         discount_factor : :obj: 'float'
             Value to discount future reward by
         """
-        super().__init__("CartPole-v1", lows, highs, bin_counts, 2, discount_factor)
+        super().__init__("CartPole-v1", lows, highs, bin_counts, 2, discount_factor, epsilon_time_constant, lr_time_constant)
 
-    def train_episode(self, visualize=False):
-        total_reward = super().train_episode(visualize=visualize)
+    def train_episode(self, visualize=False, max_steps=np.inf):
+        total_reward = super().train_episode(visualize=visualize, max_steps=max_steps)
         
         return total_reward
