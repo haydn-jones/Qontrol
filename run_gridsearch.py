@@ -1,18 +1,21 @@
-from Agents import CartPoleQontrol
-from gridsearch import evaluate_parameters
+from agents import CartPoleQontrol
+from utils import run_gridsearch
+import numpy as np
 
 parameters = {
-	"bin_counts": [3, 3, 4, 8],
-	"epsilon_time_constant": 100,
-	"lr_time_constant": 100,
+	"bin_counts": [range(1, 10), range(1, 10), range(1, 10), range(1, 10)],
+	"epsilon_time_constant": [50, 100, 150, 200],
+	"lr_time_constant": [50, 100, 150, 200],
 }
 
-result = evaluate_parameters(
+results = run_gridsearch(
 	agent_class=CartPoleQontrol,
 	parameters=parameters,
-	trials=10,
-	n_episodes=600,
-	max_episode_length=200
+	trials=20,
+	n_episodes=1000,
+	max_episode_length=500
 )
 
-print(result)
+results = sorted(results, key=lambda x: np.average(x[1]))
+for result in results:
+	print(result)

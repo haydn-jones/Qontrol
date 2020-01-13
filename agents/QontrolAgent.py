@@ -34,7 +34,6 @@ class QontrolAgent():
 
 		self.env = gym.make(env)
 
-	@profile
 	def train_episode(self, visualize=False, max_steps=np.inf):
 		""" Runs an episode and updates at each step with the Bellman equation. Returns cumulative reward """\
 

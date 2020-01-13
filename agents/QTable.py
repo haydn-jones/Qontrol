@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class DiscretizeQTable():
 	"""Q Table that takes a continuous domain and discretizes it by means of bucketing (histogram)
 	"""
