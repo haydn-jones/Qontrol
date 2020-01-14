@@ -7,10 +7,10 @@ class CartPoleQontrol(QontrolAgent):
 	def __init__(self,
 				lows=[-2.5, -4.5, -0.28, -4.0],
 				highs=[2.5, 4.5, 0.28, 4.0],
-				bin_counts=[3, 3, 4, 8],
+				bin_counts=[1, 1, 4, 9],
 				discount_factor=0.999,
-				epsilon_time_constant = 100,
-				lr_time_constant = 100,
+				epsilon_time_constant=50,
+				lr_time_constant=50,
 	):
 		"""
 		Notes

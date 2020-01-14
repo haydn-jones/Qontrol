@@ -52,7 +52,7 @@ def evaluate_parameters(agent_class, parameters, trials, n_episodes, max_episode
 		performance.append(np.average(trial_rewards))
 		# performance.append(calc_wma_reverse(trial_rewards))
 
-	return wma_performance
+	return performance
 
 def calc_wma_reverse(vals):
 	""" Calculates a weighted moving average of vals, higher weights to first elements.

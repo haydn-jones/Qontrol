@@ -3,7 +3,7 @@ from utils import run_gridsearch
 import numpy as np
 
 parameters = {
-	"bin_counts": [range(1, 10), range(1, 10), range(1, 10), range(1, 10)],
+	"bin_counts": [range(1, 3), range(1, 3), range(1, 5), range(5, 10)],
 	"epsilon_time_constant": [50, 100, 150, 200],
 	"lr_time_constant": [50, 100, 150, 200],
 }
