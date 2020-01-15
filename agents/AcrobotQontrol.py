@@ -1,8 +1,8 @@
 from agents.QontrolAgent import QontrolAgent
 import numpy as np
 
-class CartPoleQontrol(QontrolAgent):
-	"""Class that trains a Q-Learning agent to play CartPole
+class AcrobotQontrol(QontrolAgent):
+	"""Class that trains a Q-Learning agent to play Acrobot
 	"""
 	def __init__(self,
 				lows=[-2.5, -4.5, -0.28, -4.0],
@@ -31,10 +31,7 @@ class CartPoleQontrol(QontrolAgent):
 		discount_factor : :obj: 'float'
 			Value to discount future reward by
 		"""
-		super().__init__("CartPole-v1", lows, highs, bin_counts, 2, discount_factor, epsilon_time_constant, lr_time_constant)
-
-		self.index_to_action = {0: 0, 1: 1}
-		self.action_to_index = {0: 0, 1: 1}
+		super().__init__("Pendulum-v0", lows, highs, bin_counts, 3, discount_factor, epsilon_time_constant, lr_time_constant)
 
 	def train_episode(self, visualize=False, max_steps=np.inf):
 		total_reward = super().train_episode(visualize=visualize, max_steps=max_steps)

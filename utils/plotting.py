@@ -21,10 +21,10 @@ class TrainPlotter():
         self.e_lr_plot.setXLink('Reward')
         self.e_lr_plot.setYRange(0, 1)
 
-    def update(self, agent, reward):
+    def update(self, reward, epsilon, learning_rate):
         self.rewards.append(reward)
-        self.epsilons.append(agent.get_epsilon())
-        self.learning_rates.append(agent.get_learning_rate())
+        self.epsilons.append(epsilon)
+        self.learning_rates.append(learning_rate)
 
         self.reward_curve.setData(self.rewards)
         self.e_curve.setData(self.epsilons)

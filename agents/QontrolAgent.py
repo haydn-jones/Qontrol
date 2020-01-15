@@ -1,4 +1,4 @@
-from agents.QTable import DiscretizeQTable
+from utils.QTable import DiscretizeQTable
 from random import random
 import itertools
 import numpy as np
@@ -23,6 +23,8 @@ class QontrolAgent():
 		discount_factor : :obj: 'float'
 			Value to discount future reward by
 		"""
+		self.index_to_action = {} # Must be provided by the child class, maps index to an action value
+		self.action_to_index = {} # Must be provided by the child class, maps action value to an index
 
 		self.Q = DiscretizeQTable(actions, lows, highs, bin_counts)
 
@@ -35,7 +37,9 @@ class QontrolAgent():
 		self.env = gym.make(env)
 
 	def train_episode(self, visualize=False, max_steps=np.inf):
-		""" Runs an episode and updates at each step with the Bellman equation. Returns cumulative reward """\
+		""" Runs an episode and updates at each step with the Bellman equation. 
+			Returns cumulative reward, epsilon, and learning rate 
+		"""
 
 		epsilon = self.get_epsilon()
 		learning_rate = self.get_learning_rate()
@@ -60,6 +64,26 @@ class QontrolAgent():
 
 		self.episodes += 1
 
+		return total_reward, epsilon, learning_rate
+
+	def evaluate_episode(self, visualize=False, max_steps=np.inf):
+		""" Runs an episode. Returns cumulative reward """
+
+		total_reward = 0
+		observation = self.env.reset()
+		observation = self.Q.discretize_state(observation)
+		for i in itertools.count(start=1): # Infinite for, keeps track of iterations
+			if visualize:
+				self.env.render()
+
+			action = self.get_action(observation, 0)
+			observation, reward, done, _ = self.env.step(action)
+			observation = self.Q.discretize_state(observation)
+
+			total_reward += reward
+			if done or i >= max_steps:
+				break
+
 		return total_reward
 
 	def get_action(self, state, epsilon):
@@ -68,11 +92,12 @@ class QontrolAgent():
 		if random() < epsilon:
 			return self.env.action_space.sample()
 
-		return np.argmax(self.Q[state])
+		return self.index_to_action[np.argmax(self.Q[state])]
 
 	def update_bellman(self, state, action, reward, next_state, learning_rate):
 		""" Updates Q table accorind to the bellman equation """
 
+		action = self.action_to_index[action]
 		self.Q[state, action] = (1 - learning_rate) * self.Q[state, action] + learning_rate * (reward + self.discount_factor * np.max(self.Q[next_state]))
 
 	def get_epsilon(self):
