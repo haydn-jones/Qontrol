@@ -7,17 +7,17 @@ class CartPoleQontrol(QontrolAgent):
 	def __init__(self,
 				lows=[-2.5, -4.5, -0.28, -4.0],
 				highs=[2.5, 4.5, 0.28, 4.0],
-				bin_counts=[1, 1, 4, 9],
+				bin_counts=[1, 1, 6, 9],
 				discount_factor=0.999,
-				epsilon_time_constant=50,
-				lr_time_constant=50,
+				epsilon_time_constant=25,
+				lr_time_constant=25,
 	):
 		"""
 		Notes
 		-----
 		The default lows and highs were found by running `find_observed_observation_bounds` in
 		utils.py for 1,000,000 episodes (or by looking at the cartpole source code). The bin
-		counts and time constants were found by a gridsearch (not yet, but they will ;) ).
+		counts and time constants were found by a gridsearch.
 
 		Parameters
 		----------
