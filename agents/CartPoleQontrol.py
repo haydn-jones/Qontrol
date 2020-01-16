@@ -1,6 +1,5 @@
 from agents.QontrolAgent import QontrolAgent
 import numpy as np
-
 class CartPoleQontrol(QontrolAgent):
 	"""Class that trains a Q-Learning agent to play CartPole
 	"""

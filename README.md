@@ -2,7 +2,7 @@
 
 # Qontrol
 
-In an effort to become more familiar with reinforcement learning, I decided to dive into Q-Learning. I have implemented a simple Q-Learning framework that I am using to solve the control problems in the OpenAI Gym package (CartPole, Acrobat, MountainCar, and Pendulum). After I have found a good set of parameters for each environment I will move on to implementing Deep Q-Learning.
+In an effort to become more familiar with reinforcement learning, I decided to dive into Q-Learning. I have implemented a simple Q-Learning framework that I am using to solve the control problems in the OpenAI Gym package (CartPole, Acrobot, MountainCar, and Pendulum). After I have found a good set of parameters for each environment I will move on to implementing Deep Q-Learning.
 
 I decided to start with Q-Learning because it is a pretty straightforward RL algorithm, and because of the recent breakthroughs in gameplay with Deep Q networks.
 
