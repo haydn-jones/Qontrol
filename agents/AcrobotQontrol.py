@@ -7,10 +7,10 @@ class AcrobotQontrol(QontrolAgent):
 	def __init__(self,
 				lows=[-1.0, -1.0, -1.0, -1.0, -7.0, -13],
 				highs=[1.0, 1.0, 1.0, 1.0, 7.0, 13],
-				bin_counts=[1, 1, 6, 9],
+				bin_counts=[6, 6, 6, 6, 8, 10],
 				discount_factor=0.999,
-				epsilon_time_constant=25,
-				lr_time_constant=25,
+				epsilon_time_constant=10_000,
+				lr_time_constant=10_000,
 	):
 		"""
 		Notes
@@ -31,6 +31,7 @@ class AcrobotQontrol(QontrolAgent):
 		discount_factor : :obj: 'float'
 			Value to discount future reward by
 		"""
+
 		super().__init__("Acrobot-v1", lows, highs, bin_counts, 3, discount_factor, epsilon_time_constant, lr_time_constant)
 
 	def train_episode(self, visualize=False, max_steps=np.inf):
