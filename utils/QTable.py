@@ -18,18 +18,17 @@ class DiscretizeQTable():
 			will always be mapped to bin 0
 		"""
 
-		self.lows = np.array(lows, np.float32)
-		self.highs = np.array(highs, np.float32)
-		self.bin_counts = np.array(bin_counts, dtype=np.int32)
+		self.lows = np.array(lows)
+		self.highs = np.array(highs)
+		self.bin_widths = (self.highs - self.lows) / bin_counts
+		self.valid_bins = np.array(bin_counts, dtype=np.int32) - 1
 
-		self.bin_widths = (self.highs - self.lows) / self.bin_counts
-
-		self.Q = np.zeros(tuple(self.bin_counts) + (n_actions, ), dtype=np.float32)
+		self.Q = np.zeros(tuple(bin_counts) + (n_actions, ))
 
 	def discretize_state(self, state):
 		state = np.maximum(state, self.lows) # clip observation to at least self.lows
 		state = ((state - self.lows) / self.bin_widths).astype(np.int32) # calcualte which bin each component falls into, astype(int) floors
-		state = np.minimum(state, self.bin_counts - 1) # elements sometimes get pushed into a bin that doesnt exist
+		state = np.minimum(state, self.valid_bins) # elements sometimes get pushed into a bin that doesnt exist
 
 		return state
 

@@ -8,7 +8,7 @@ def main():
 
 	visualize_after = 50000 # Start visualizing after N steps
 	visualize = False
-	for episode in trange(200):
+	for episode in trange(1_000):
 		if episode == visualize_after:
 			visualize = True
 
