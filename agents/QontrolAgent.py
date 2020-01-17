@@ -96,7 +96,7 @@ class QontrolAgent():
 	def update_bellman(self, state, action, reward, next_state, learning_rate):
 		""" Updates Q table accorind to the bellman equation """
 
-		self.Q[state, action] = (1 - learning_rate) * self.Q[state, action] + learning_rate * (reward + self.discount_factor * np.max(self.Q[next_state]))
+		self.Q[state, action] = (1 - learning_rate) * self.Q[state, action] + learning_rate * (reward + self.discount_factor * max(self.Q[next_state]))
 
 	def get_epsilon(self):
 		""" Returns epsilon to be used at episode self.episodes """
