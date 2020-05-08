@@ -4,7 +4,7 @@ import gym
 from tqdm import trange
 from joblib import Parallel, delayed
 
-def run_gridsearch(agent_class, parameters, trials, n_episodes, max_episode_length=np.inf):
+def gridsearch(agent_class, parameters, trials, n_episodes, max_episode_length=np.inf):
 	""" Parameters should a dictionary of the form of the form:
 		{
 			"bin_counts": List of iterables, each iterable contains possible bin values for respective observation element,

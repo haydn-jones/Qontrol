@@ -1,5 +1,5 @@
 from agents import CartPoleQontrol
-from utils import run_gridsearch
+from utils import gridsearch
 import numpy as np
 
 parameters = {
@@ -8,7 +8,7 @@ parameters = {
 	"lr_time_constant": [50, 100, 150, 200],
 }
 
-results = run_gridsearch(
+results = gridsearch(
 	agent_class=CartPoleQontrol,
 	parameters=parameters,
 	trials=20,

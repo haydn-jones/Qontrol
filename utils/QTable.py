@@ -7,13 +7,13 @@ class DiscretizeQTable():
 		"""
 		Parameters
 		----------
-		n_actions : int
+		n_actions: int
 			Number of actions you can take in the environment
-		lows : :obj:`list` of :obj:`float`
+		lows: `list` of `float`
 			Lower bounds of each element in the observation (elements will be clipped to this)
-		highs : :obj:`list` of :obj:`float`
+		highs: `list` of `float`
 			Upper bounds of each element in the observation (elements will be clipped to this)
-		bin_counts : :obj:`list` of :obj:`int`
+		bin_counts: `list` of `int`
 			Number of bins used for each index. 1 bin means the element will not be used as it
 			will always be mapped to bin 0
 		"""
